@@ -22,6 +22,7 @@ if sys.version_info.minor < 5:
 # install phenograph if pip3 is installed
 if shutil.which('pip3'):
     call(['pip3', 'install', 'git+https://github.com/jacoblevine/phenograph.git'])
+    call(['pip3', 'install', 'git+https://github.com/pkathail/magic.git'])
 
 # get version
 with open('src/seqc/version.py') as f:
@@ -59,6 +60,7 @@ setup(
       'statsmodels',
       'ecdsa',
       'dill',
+      'jupyter',
       'multiprocessing_on_dill',
       'jinja2',
       'pycrypto',
