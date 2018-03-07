@@ -101,7 +101,7 @@ def parse_args(args):
     f.add_argument('--low-coverage-alpha', metavar='LA',
                    help='FDR rate for low coverage reads filter in mars-seq datasets. '
                         'Float between 0 and 1, default=0.25',
-                   default=0.25, type=float) 
+                   default=0.25, type=float)
 
     s = p.add_argument_group('alignment arguments')
     s.add_argument('--star-args', default=None, nargs='*',
@@ -150,6 +150,17 @@ def parse_args(args):
     start.add_argument(
         '-k', '--rsa-key', help='RSA key registered to your aws account',
         default=None)
+
+    # NOTEBOOK PARSERS
+    notebook_sp = subparsers.add_parser('notebook', help='notebook tools')
+    _nb_parser = notebook_sp.add_subparsers()
+    merge = _nb_parser.add_parser('merge', help='merge multiple datasets prior to running an analysis notebook')
+    merge.add_argument('-o', '--output-filename', help='name for merged fastq file')
+    merge.add_argument('-i', '--input-notebooks', nargs='+', help='notebooks to merge')
+
+    generate = _nb_parser.add_parser('generate', help='generate a notebook from a dataset')
+    generate.add_argument('-i', '--input-count-matrix', help='count matrix file')
+    generate.add_argument('-o', '--output-notebook', help='filename for output notebook')
 
     pindex = subparsers.add_parser('index', help='create a SEQC index')
     pindex.add_argument(
