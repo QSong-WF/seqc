@@ -1,20 +1,42 @@
-from typing import List
+from typing import List, Iterable
 from jinja2 import Environment, FileSystemLoader
 import os
 import pandas as pd
-import nbformat
 import tempfile
+import io
+from contextlib import redirect_stdout
+
+import nbformat
 from nbconvert.preprocessors import ExecutePreprocessor
 
 
 class Notebook:
 
-    def __init__(self, output_directory, *samples):
-        self._output_directory: str = output_directory
-        self._samples: List = samples
+    def __init__(self, output_stem: str, *data):
+
+        # strip notebook affix if user provided it; this is a common error mode
+        if output_stem.endswith('.ipynb'):
+            output_stem = output_stem.replace('.ipynb', '')
+        self._output_stem: str = output_stem
+
+        self._data: List[str] = data
         self._this_dir = os.path.dirname(os.path.abspath(__file__))
 
-    def merge_data(self, merged_sample_name='merged_counts.csv', remove_unmerged=False):
+    @property
+    def notebook_path(self):
+        return self._output_stem + '.ipynb'
+
+    @property
+    def merged_data(self):
+        if isinstance(self._data, str):
+            if os.path.isfile(self._data):
+                return os.path.abspath(self._data)
+        elif isinstance(self._data, Iterable) and isinstance(self._data[0], str):
+            if os.path.isfile(self._data[0]):
+                return os.path.abspath(self._data[0])
+        raise TypeError('Data is not a 1-length iterable or string that contains a filepath')
+
+    def merge_data(self, merged_sample_name: str=None, remove_unmerged=False):
         """
         This function will merge any datasets provided as nested lists.
         Each top-level value is considered an input alias.
@@ -26,46 +48,43 @@ class Notebook:
         :return None: The list of merged file names will replace the list passed to the class in
           self._datasets
         """
-        # merge datasets
-        dfs = [pd.read_csv(csv, index_col=0) for csv in self._samples]
+        dfs = [pd.read_csv(csv, index_col=0) for csv in self._data]
         df = pd.concat(
             dfs,
-            keys=list(range(len(self._samples))),
+            keys=list(range(len(self._data))),
             names=['sample_number', 'cell_id']
         )
 
-        # write merged datafiles using stem of the first file and underscore joined names
-        merged_csv = '{dir}/{files}'.format(
-            dir=self._output_directory,
-            files=merged_sample_name,
-        )
-
-        df.to_csv(merged_csv)
+        if not merged_sample_name:
+            merged_sample_name = self._output_stem + '_merged_data.csv'
+        df.to_csv(merged_sample_name)
 
         # delete original files, if requested
         if remove_unmerged:
-            for csv in self._samples:
+            for csv in self._data:
                 os.remove(csv)
 
         # update file urns
-        self._samples = merged_csv
+        self._data = merged_sample_name
 
-    def write_template(self, notebook_filename: str):
+    def write_template(self):
         """write a filled ipython notebook to disk
 
-        :param str notebook_filename:
         :return:
         """
+
         j2_env = Environment(loader=FileSystemLoader(self._this_dir), trim_blocks=True)
         rendered = j2_env.get_template('analysis_template.json').render(
-            directory=self._output_directory,
-            sample=self._samples,
+            output_stem=self._output_stem,
+            data=os.path.abspath(self.merged_data),
         )
-        with open(notebook_filename, 'w') as fdw:
+        with open(self._output_stem + '.ipynb', 'w') as fdw:
             fdw.write(rendered)
 
-    @classmethod
-    def run_notebook(cls, notebook_filename):
+    def run_notebook(self, notebook_filename: str=None):
+
+        if not notebook_filename:
+            notebook_filename = self._output_stem + '.ipynb'
 
         dir_ = tempfile.mkdtemp()
         with open(notebook_filename) as f:
