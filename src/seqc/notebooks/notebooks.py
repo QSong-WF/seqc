@@ -1,10 +1,7 @@
-from typing import List, Iterable
 from jinja2 import Environment, FileSystemLoader
 import os
 import pandas as pd
 import tempfile
-import io
-from contextlib import redirect_stdout
 
 import nbformat
 from nbconvert.preprocessors import ExecutePreprocessor
@@ -17,9 +14,9 @@ class Notebook:
         # strip notebook affix if user provided it; this is a common error mode
         if output_stem.endswith('.ipynb'):
             output_stem = output_stem.replace('.ipynb', '')
-        self._output_stem: str = output_stem
+        self._output_stem = output_stem
 
-        self._data: List[str] = data
+        self._data = data
         self._this_dir = os.path.dirname(os.path.abspath(__file__))
 
     @property
@@ -31,12 +28,12 @@ class Notebook:
         if isinstance(self._data, str):
             if os.path.isfile(self._data):
                 return os.path.abspath(self._data)
-        elif isinstance(self._data, Iterable) and isinstance(self._data[0], str):
+        elif isinstance(self._data, (list, tuple)) and isinstance(self._data[0], str):
             if os.path.isfile(self._data[0]):
                 return os.path.abspath(self._data[0])
         raise TypeError('Data is not a 1-length iterable or string that contains a filepath')
 
-    def merge_data(self, merged_sample_name: str=None, remove_unmerged=False):
+    def merge_data(self, merged_sample_name=None, remove_unmerged=False):
         """
         This function will merge any datasets provided as nested lists.
         Each top-level value is considered an input alias.
@@ -81,7 +78,7 @@ class Notebook:
         with open(self._output_stem + '.ipynb', 'w') as fdw:
             fdw.write(rendered)
 
-    def run_notebook(self, notebook_filename: str=None):
+    def run_notebook(self, notebook_filename=None):
 
         if not notebook_filename:
             notebook_filename = self._output_stem + '.ipynb'
