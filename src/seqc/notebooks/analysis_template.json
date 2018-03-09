@@ -31,8 +31,8 @@
    "outputs": [],
    "source": [
     "#  filled automatically with Jinja2\n",
-    "OUTPUT_DIRECTORY = '{{ directory }}'\n",
-    "SAMPLE = '{{ sample }}'"
+    "OUTPUT_STEM = '{{ output_stem }}'\n",
+    "DATA = '{{ data }}'"
    ]
   },
   {
@@ -133,7 +133,7 @@
    "source": [
     "# load counts \n",
     "counts_dict = OrderedDict()\n",
-    "counts = pd.read_csv(SAMPLE, index_col=[0, 1])        \n",
+    "counts = pd.read_csv(DATA, index_col=[0, 1])        \n",
     "\n",
     "# convert to int32\n",
     "counts = counts.astype(np.int32)      \n",
@@ -299,7 +299,7 @@
    "source": [
     "# all_cells = list()\n",
     "# all_genes = list()\n",
-    "# for sample in SAMPLE:\n",
+    "# for sample in DATA:\n",
     "#     counts = counts_dict[sample]\n",
     "    \n",
     "#     # update rownames\n",
@@ -325,7 +325,7 @@
    "source": [
     "# counts = pd.DataFrame(np.zeros([len(all_cells), len(all_genes)]),\n",
     "#             index=all_cells, columns=all_genes)\n",
-    "# for sample in SAMPLE:\n",
+    "# for sample in DATA:\n",
     "#     counts.loc[counts_dict[sample].index, counts_dict[sample].columns] = counts_dict[sample]"
    ]
   },
@@ -948,9 +948,9 @@
    },
    "outputs": [],
    "source": [
-    "pickle.dump(tsne, open(OUTPUT_DIRECTORY + 'tsne.p', 'wb'))\n",
-    "pickle.dump(imputed_data, open(OUTPUT_DIRECTORY + 'imputed_data.p', 'wb'))\n",
-    "pickle.dump(communities, open(OUTPUT_DIRECTORY + 'communities.p', 'wb'))"
+    "pickle.dump(tsne, open(OUTPUT_STEM + '_tsne.p', 'wb'))\n",
+    "pickle.dump(imputed_data, open(OUTPUT_STEM + '_imputed_data.p', 'wb'))\n",
+    "pickle.dump(communities, open(OUTPUT_STEM + '_communities.p', 'wb'))"
    ]
   }
  ],
