@@ -18,7 +18,7 @@ seqc_dir = '/'.join(seqc.__file__.split('/')[:-3]) + '/'
 
 # fill and uncomment these variables to avoid having to provide input to tests
 TEST_BUCKET = "seqc-public"  # None
-EMAIL = "mail@ambrosejcarr.com"  # None
+EMAIL = None
 # RSA_KEY = None
 
 # define some constants for testing
