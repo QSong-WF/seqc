@@ -17,7 +17,7 @@ logging.basicConfig()
 seqc_dir = '/'.join(seqc.__file__.split('/')[:-3]) + '/'
 
 # fill and uncomment these variables to avoid having to provide input to tests
-TEST_BUCKET = "dp-lab-data"  # None
+TEST_BUCKET = "seqc-public"  # None
 EMAIL = "mail@ambrosejcarr.com"  # None
 # RSA_KEY = None
 
