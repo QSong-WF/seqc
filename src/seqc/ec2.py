@@ -25,6 +25,7 @@ log.logging.getLogger('boto3').setLevel(log.logging.CRITICAL)
 # set default values for a few parameters
 IMAGE_ID = 'ami-8927f1f3'
 
+
 def _get_ec2_configuration():
     """assumes you have awscli and that you have configured it. If so, the default values
     for credentials will be searchable!"""

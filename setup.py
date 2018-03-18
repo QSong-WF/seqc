@@ -7,11 +7,14 @@ from warnings import warn
 import py_compile
 
 
-# Replace py_compile.compile with a function that calls it with doraise=True so stop when there is a syntax error
+# Replace py_compile.compile with a function that calls it with doraise=True
+# so stop when there is a syntax error
 orig_py_compile = py_compile.compile
+
 
 def doraise_py_compile(file, cfile=None, dfile=None, doraise=False):
     orig_py_compile(file, cfile=cfile, dfile=dfile, doraise=True)
+
 
 py_compile.compile = doraise_py_compile
 
@@ -38,7 +41,7 @@ setup(
     package_dir={'': 'src'},
     package_data={'': ['*.r', '*.R']},
     packages=['seqc', 'seqc.sequence', 'seqc.alignment', 'seqc.core', 'seqc.stats',
-              'seqc.summary'],
+              'seqc.summary', 'seqc.notebooks'],
     install_requires=[
       'numpy>=1.10.0',
       'bhtsne',
@@ -98,6 +101,7 @@ def ignore_test_and_tools(dir_, files):
     :return list: list of files that should be filtered, and not copied.
     """
     return [f for f in files if (f == 'test' or f.startswith('.'))]
+
 
 # install tools and a local copy of seqc.
 shutil.copytree(setup_dir, seqc_dir, ignore=ignore_test_and_tools)  # copy seqc repository
